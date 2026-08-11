@@ -3,6 +3,8 @@ title: 'Movie Title'
 year: 2026
 director: 'Director Name'
 rating: 7.5
+# Optional thumbnail. Omit it and the review gets a lettered fallback tile.
+# poster: './images/movie-title.jpg'
 genres: [Drama]
 description: 'One line: your take, in a sentence someone could read on a card.'
 watchedDate: 2026-08-11
@@ -18,7 +20,9 @@ To write a review:
   2. Fill in the frontmatter above. `rating` is out of 10 and takes decimals.
      Any string in `genres` works — genre pages are generated automatically.
   3. Write the review below. Standard markdown: headings, lists, **bold**,
-     > blockquotes, and images.
+     > blockquotes, and images. For images, drop files in
+     src/content/reviews/images/ and reference them relatively:
+     ![Alt text](./images/my-screenshot.jpg)
   4. Delete the `draft: true` line (or set it to false).
 
 Filenames starting with `_` are ignored by the content loader, so this

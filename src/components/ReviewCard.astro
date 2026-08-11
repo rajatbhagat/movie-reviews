@@ -1,6 +1,7 @@
 ---
 import type { CollectionEntry } from 'astro:content';
 import Rating from './Rating.astro';
+import Poster from './Poster.astro';
 import { slugify } from '../utils/slug';
 import { url } from '../utils/url';
 
@@ -9,30 +10,55 @@ interface Props {
 }
 
 const { review } = Astro.props;
-const { title, year, director, rating, genres } = review.data;
+const { title, year, director, rating, genres, poster } = review.data;
+const href = url(`/reviews/${review.id}/`);
 ---
 
 <article class="card">
-  <div class="top">
-    <h3><a href={url(`/reviews/${review.id}/`)}>{title}</a> <span class="muted year">({year})</span></h3>
-    <Rating rating={rating} />
+  <a href={href} class="thumb" tabindex="-1" aria-hidden="true">
+    <Poster poster={poster} title={title} size="card" />
+  </a>
+
+  <div class="body">
+    <div class="top">
+      <h3><a href={href}>{title}</a> <span class="muted year">({year})</span></h3>
+      <Rating rating={rating} />
+    </div>
+    <p class="muted director">Directed by {director}</p>
+    <p class="muted take">{review.data.description}</p>
+    {
+      genres.length > 0 && (
+        <p class="genres">
+          {genres.map((g) => (
+            <a href={url(`/genres/${slugify(g)}/`)} class="pill">
+              {g}
+            </a>
+          ))}
+        </p>
+      )
+    }
   </div>
-  <p class="muted director">Directed by {director}</p>
-  <p class="muted take">{review.data.description}</p>
-  {
-    genres.length > 0 && (
-      <p class="genres">
-        {genres.map((g) => (
-          <a href={url(`/genres/${slugify(g)}/`)} class="pill">
-            {g}
-          </a>
-        ))}
-      </p>
-    )
-  }
 </article>
 
 <style>
+  .card {
+    display: flex;
+    gap: 1.25rem;
+    align-items: flex-start;
+  }
+
+  /* The thumbnail repeats the title link, so it's hidden from assistive tech
+     and taken out of the tab order rather than read out twice. */
+  .thumb {
+    display: block;
+    line-height: 0;
+  }
+
+  .body {
+    min-width: 0;
+    flex: 1;
+  }
+
   .top {
     display: flex;
     align-items: baseline;
@@ -75,5 +101,12 @@ const { title, year, director, rating, genres } = review.data;
     gap: 0.4rem;
     flex-wrap: wrap;
     margin: 0.85rem 0 0;
+  }
+
+  @media (max-width: 520px) {
+    .card {
+      gap: 1rem;
+      padding: 1rem 1.1rem;
+    }
   }
 </style>
