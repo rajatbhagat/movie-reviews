@@ -1,0 +1,60 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ReviewCard from '../components/ReviewCard.astro';
+import site from '../data/site.json';
+import { url } from '../utils/url';
+
+/** Minimum rating to make the cut. 4+ out of 5 is "worth your evening". */
+const THRESHOLD = 4;
+
+const reviews = (await getCollection('reviews', ({ data }) => !data.draft))
+  .filter(({ data }) => data.rating >= THRESHOLD)
+  // Best first; ties broken by what was watched most recently.
+  .sort(
+    (a, b) => b.data.rating - a.data.rating || b.data.watchedDate.valueOf() - a.data.watchedDate.valueOf()
+  );
+---
+
+<BaseLayout
+  title={`Best of — ${site.title}`}
+  description={`The highest-rated films on ${site.title} — everything worth ${THRESHOLD} stars or more.`}
+>
+  <h1>Best of</h1>
+  <p class="meta muted">
+    Everything rated {THRESHOLD} or higher, best first.
+  </p>
+
+  {
+    reviews.length === 0 ? (
+      <p class="muted">Nothing has cleared {THRESHOLD} stars yet. Check back.</p>
+    ) : (
+      <div class="review-list">
+        {reviews.map((review) => (
+          <ReviewCard review={review} />
+        ))}
+      </div>
+    )
+  }
+
+  <p><a href={url('/')}>← All reviews</a></p>
+</BaseLayout>
+
+<style>
+  h1 {
+    margin-top: 2.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .meta {
+    font-size: 0.9rem;
+    margin-top: 0;
+    margin-bottom: 1.5rem;
+  }
+
+  .review-list {
+    display: grid;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+</style>
