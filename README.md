@@ -13,10 +13,21 @@ deployed to GitHub Pages. Same stack and design system as
 Every review is one markdown file in `src/content/reviews/`. The filename
 becomes the URL — `dune-part-two.md` → `/reviews/dune-part-two/`.
 
-1. Copy `_template.md` to a new filename.
+Two starting points, pick whichever suits you:
+
+- **`everything-everywhere-all-at-once.md`** — a fully worked example. Every
+  frontmatter field is annotated inline with YAML comments, which the build
+  strips, so none of the commentary reaches the published page. Copy this one
+  if you want the explanation as you go.
+- **`_template.md`** — the bare skeleton, no commentary. Copy this one once you
+  know the shape.
+
+Then:
+
+1. Copy the file to a new filename.
 2. Fill in the frontmatter.
 3. Write the review in markdown below it.
-4. Delete `draft: true`.
+4. Delete `draft: true` if present.
 5. Commit and push to `main`. GitHub Actions builds and deploys it.
 
 ### Frontmatter
@@ -127,6 +138,7 @@ src/
 
 ## Sample content
 
-`dune-part-two.md`, `past-lives.md`, and `the-menu.md` are placeholder reviews
-so the site has something to render. **Delete them** when you add your own —
-they are not your opinions.
+`everything-everywhere-all-at-once.md`, `dune-part-two.md`, `past-lives.md`,
+and `the-menu.md` are placeholder reviews so the site has something to render.
+**They are not your opinions** — keep the first one around as a reference while
+you get started, then delete all four.
