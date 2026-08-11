@@ -2,7 +2,7 @@
 title: 'The Menu'
 year: 2022
 director: 'Mark Mylod'
-rating: 7
+rating: 3.5
 genres: [Thriller, Comedy]
 description: 'A very funny satire for two acts, then a thriller that is less interesting than its setup.'
 watchedDate: 2026-08-02

@@ -2,7 +2,7 @@
 title: 'Dune: Part Two'
 year: 2024
 director: 'Denis Villeneuve'
-rating: 9
+rating: 4.5
 genres: [Sci-Fi, Epic, Drama]
 description: 'A sequel that gets bigger without getting louder, and finally lets the story turn dark.'
 watchedDate: 2026-07-20

@@ -16,8 +16,8 @@ const reviews = defineCollection({
       title: z.string(),
       year: z.number(),
       director: z.string(),
-      /** Out of 10. Decimals are fine (7.5). */
-      rating: z.number().min(0).max(10),
+      /** Out of 5. Decimals are fine (3.5) and render as partial stars. */
+      rating: z.number().min(0).max(5),
       /**
        * Optional thumbnail, path relative to the markdown file:
        *   poster: './images/dune-part-two.jpg'
