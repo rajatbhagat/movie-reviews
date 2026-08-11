@@ -1,12 +1,14 @@
 ---
 import site from '../data/site.json';
+import SiteSearch from './SiteSearch.astro';
 import { url, stripBase } from '../utils/url';
 
+// Search isn't here: it's the magnifying glass in .nav-right, which searches in
+// place. /search/ still exists as the no-JS fallback and SiteSearch links it.
 const navItems = [
   { href: '/', label: 'Reviews' },
   { href: '/best/', label: 'Best' },
   { href: '/genres/', label: 'Genres' },
-  { href: '/search/', label: 'Search' },
   { href: '/about/', label: 'About' },
 ];
 
@@ -37,6 +39,7 @@ const isActive = (href: string) =>
           ))
         }
       </ul>
+      <SiteSearch />
       <button id="theme-toggle" aria-label="Toggle light/dark theme" title="Toggle theme">
         <svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
           <circle cx="12" cy="12" r="4" />
