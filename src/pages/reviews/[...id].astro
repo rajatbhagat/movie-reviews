@@ -3,19 +3,43 @@ import { getCollection, render } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Rating from '../../components/Rating.astro';
 import Poster from '../../components/Poster.astro';
+import ReviewCard from '../../components/ReviewCard.astro';
 import site from '../../data/site.json';
 import { slugify } from '../../utils/slug';
 import { url } from '../../utils/url';
 
 export async function getStaticPaths() {
   const reviews = await getCollection('reviews', ({ data }) => !data.draft);
-  return reviews.map((review) => ({
-    params: { id: review.id },
-    props: { review },
-  }));
+  return reviews.map((review) => {
+    const own = new Set(review.data.genres.map(slugify));
+    // Only films that actually share a genre qualify. Topping the row up with
+    // recent-but-unrelated reviews would make the heading a lie, so a review
+    // with no overlap (or no genres at all) gets an empty list and the section
+    // isn't rendered.
+    const related = reviews
+      .filter((other) => other.id !== review.id)
+      .map((other) => ({
+        other,
+        overlap: other.data.genres.filter((genre) => own.has(slugify(genre))).length,
+      }))
+      .filter(({ overlap }) => overlap > 0)
+      // Most genres in common first; recency breaks ties.
+      .sort(
+        (a, b) =>
+          b.overlap - a.overlap ||
+          b.other.data.watchedDate.valueOf() - a.other.data.watchedDate.valueOf()
+      )
+      .slice(0, 3)
+      .map(({ other }) => other);
+
+    return {
+      params: { id: review.id },
+      props: { review, related },
+    };
+  });
 }
 
-const { review } = Astro.props;
+const { review, related } = Astro.props;
 const { Content } = await render(review);
 const { title, year, director, rating, genres, description, watchedDate, poster } = review.data;
 const watchedStr = watchedDate.toLocaleDateString('en-US', {
@@ -25,7 +49,13 @@ const watchedStr = watchedDate.toLocaleDateString('en-US', {
 });
 ---
 
-<BaseLayout title={`${title} (${year}) — ${site.title}`} description={description} type="article">
+<BaseLayout
+  title={`${title} (${year}) — ${site.title}`}
+  description={description}
+  type="article"
+  image={poster}
+  imageAlt={`${title} poster`}
+>
   <article>
     <header>
       <Poster poster={poster} title={title} size="detail" />
@@ -54,6 +84,19 @@ const watchedStr = watchedDate.toLocaleDateString('en-US', {
     <div class="content">
       <Content />
     </div>
+
+    {
+      related.length > 0 && (
+        <section class="related">
+          <h2>Related reviews</h2>
+          <div class="review-list">
+            {related.map((other) => (
+              <ReviewCard review={other} />
+            ))}
+          </div>
+        </section>
+      )
+    }
 
     <p><a href={url('/')}>← All reviews</a></p>
   </article>
@@ -114,6 +157,22 @@ const watchedStr = watchedDate.toLocaleDateString('en-US', {
 
   .content {
     margin: 2rem 0;
+  }
+
+  .related {
+    margin: 2.5rem 0 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+  }
+
+  .related h2 {
+    font-size: 1.15rem;
+    margin: 0 0 1rem;
+  }
+
+  .review-list {
+    display: grid;
+    gap: 1rem;
   }
 
   /* Stills and posters break out past the ~44rem reading column so their
