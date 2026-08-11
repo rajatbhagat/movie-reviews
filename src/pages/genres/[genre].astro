@@ -1,0 +1,52 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ReviewCard from '../../components/ReviewCard.astro';
+import site from '../../data/site.json';
+import { slugify } from '../../utils/slug';
+import { url } from '../../utils/url';
+
+export async function getStaticPaths() {
+  const reviews = await getCollection('reviews', ({ data }) => !data.draft);
+  // Group by slug so "Sci-Fi" and "sci-fi" are one page.
+  const bySlug = new Map<string, { name: string; reviews: typeof reviews }>();
+  for (const review of reviews) {
+    for (const genre of review.data.genres) {
+      const slug = slugify(genre);
+      const entry = bySlug.get(slug) ?? { name: genre, reviews: [] };
+      entry.reviews.push(review);
+      bySlug.set(slug, entry);
+    }
+  }
+  return [...bySlug.entries()].map(([slug, { name, reviews }]) => ({
+    params: { genre: slug },
+    props: {
+      name,
+      reviews: reviews.sort((a, b) => b.data.watchedDate.valueOf() - a.data.watchedDate.valueOf()),
+    },
+  }));
+}
+
+const { name, reviews } = Astro.props;
+---
+
+<BaseLayout title={`${name} — ${site.title}`} description={`Movie reviews in the ${name} genre.`}>
+  <h1><span class="muted">Genre:</span> {name}</h1>
+  <div class="review-list">
+    {reviews.map((review) => <ReviewCard review={review} />)}
+  </div>
+  <p><a href={url('/genres/')}>← All genres</a></p>
+</BaseLayout>
+
+<style>
+  h1 {
+    margin-top: 2.5rem;
+    font-size: 1.6rem;
+  }
+
+  .review-list {
+    display: grid;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+</style>

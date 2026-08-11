@@ -1,0 +1,63 @@
+---
+interface Props {
+  /** Out of 10; decimals allowed. */
+  rating: number;
+  size?: 'sm' | 'lg';
+}
+
+const { rating, size = 'sm' } = Astro.props;
+// Five stars span the full 0–10 range, so a filled overlay of `pct` width
+// renders half-stars and other fractions without extra glyphs.
+const pct = Math.max(0, Math.min(100, (rating / 10) * 100));
+---
+
+<span class:list={['rating', size]} aria-label={`Rated ${rating} out of 10`}>
+  <span class="stars" aria-hidden="true">
+    <span class="stars-fill" style={`width:${pct}%`}>★★★★★</span>
+    ★★★★★
+  </span>
+  <span class="score">{rating}<span class="muted">/10</span></span>
+</span>
+
+<style>
+  .rating {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    white-space: nowrap;
+  }
+
+  .stars {
+    position: relative;
+    display: inline-block;
+    color: var(--border);
+    letter-spacing: 0.08em;
+  }
+
+  .stars-fill {
+    position: absolute;
+    top: 0;
+    left: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    color: var(--star);
+    letter-spacing: 0.08em;
+  }
+
+  .score {
+    font-weight: 600;
+    font-size: 0.85rem;
+  }
+
+  .sm {
+    font-size: 0.95rem;
+  }
+
+  .lg {
+    font-size: 1.35rem;
+  }
+
+  .lg .score {
+    font-size: 1rem;
+  }
+</style>
