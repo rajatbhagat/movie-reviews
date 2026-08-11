@@ -1,0 +1,34 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import site from '../data/site.json';
+import { url } from '../utils/url';
+---
+
+<BaseLayout title={`About — ${site.title}`} description={`About ${site.title}.`}>
+  <section>
+    <h1>About</h1>
+    <p>
+      {site.tagline}
+    </p>
+    <p>
+      Ratings are out of 10 and entirely personal — a 7 usually means "worth your
+      time", and anything below a 5 means I wanted those hours back. I write these
+      mostly so I remember what I thought a year later.
+    </p>
+    <p>
+      Written by {site.author}. You can find my software work over at
+      <a href={site.portfolio} target="_blank" rel="noopener">my portfolio</a>, or
+      reach me by <a href={`mailto:${site.email}`}>email</a>.
+    </p>
+    <p>
+      New reviews land in the <a href={url('/rss.xml')}>RSS feed</a>.
+    </p>
+  </section>
+</BaseLayout>
+
+<style>
+  section {
+    max-width: 44rem;
+    margin-top: 2.5rem;
+  }
+</style>

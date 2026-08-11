@@ -1,0 +1,64 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ReviewCard from '../components/ReviewCard.astro';
+import site from '../data/site.json';
+import { url } from '../utils/url';
+
+const reviews = (await getCollection('reviews', ({ data }) => !data.draft)).sort(
+  (a, b) => b.data.watchedDate.valueOf() - a.data.watchedDate.valueOf()
+);
+---
+
+<BaseLayout title={site.title} description={site.metaDescription}>
+  <section class="intro">
+    <h1>{site.title}</h1>
+    <p class="muted tagline">{site.tagline}</p>
+  </section>
+
+  <p class="meta muted">
+    {reviews.length} {reviews.length === 1 ? 'review' : 'reviews'} · newest first ·
+    <a href={url('/genres/')}>browse by genre</a>
+  </p>
+
+  {
+    reviews.length === 0 ? (
+      <p class="muted">
+        No reviews published yet. Drop a markdown file in
+        <code>src/content/reviews/</code> to add one.
+      </p>
+    ) : (
+      <div class="review-list">
+        {reviews.map((review) => (
+          <ReviewCard review={review} />
+        ))}
+      </div>
+    )
+  }
+</BaseLayout>
+
+<style>
+  .intro {
+    margin-top: 2.5rem;
+  }
+
+  h1 {
+    margin-bottom: 0.5rem;
+  }
+
+  .tagline {
+    font-size: 1.05rem;
+    margin-top: 0;
+    max-width: 44rem;
+  }
+
+  .meta {
+    font-size: 0.9rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .review-list {
+    display: grid;
+    gap: 1rem;
+  }
+</style>

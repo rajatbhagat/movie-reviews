@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://rajatbhagat.github.io/movie-reviews/sitemap-index.xml

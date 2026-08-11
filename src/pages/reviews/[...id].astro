@@ -1,0 +1,115 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Rating from '../../components/Rating.astro';
+import site from '../../data/site.json';
+import { slugify } from '../../utils/slug';
+import { url } from '../../utils/url';
+
+export async function getStaticPaths() {
+  const reviews = await getCollection('reviews', ({ data }) => !data.draft);
+  return reviews.map((review) => ({
+    params: { id: review.id },
+    props: { review },
+  }));
+}
+
+const { review } = Astro.props;
+const { Content } = await render(review);
+const { title, year, director, rating, genres, description, watchedDate } = review.data;
+const watchedStr = watchedDate.toLocaleDateString('en-US', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+});
+---
+
+<BaseLayout title={`${title} (${year}) — ${site.title}`} description={description} type="article">
+  <article>
+    <header>
+      <h1>{title} <span class="muted year">({year})</span></h1>
+      <p class="byline muted">Directed by {director}</p>
+      <div class="rating-row">
+        <Rating rating={rating} size="lg" />
+        <span class="muted watched">Watched {watchedStr}</span>
+      </div>
+      <p class="muted description">{description}</p>
+      {
+        genres.length > 0 && (
+          <p class="genres">
+            {genres.map((g) => (
+              <a href={url(`/genres/${slugify(g)}/`)} class="pill">
+                {g}
+              </a>
+            ))}
+          </p>
+        )
+      }
+    </header>
+
+    <div class="content">
+      <Content />
+    </div>
+
+    <p><a href={url('/')}>← All reviews</a></p>
+  </article>
+</BaseLayout>
+
+<style>
+  article {
+    max-width: 44rem;
+    margin: 2.5rem auto 0;
+  }
+
+  h1 {
+    margin: 0 0 0.35rem;
+    font-size: 2rem;
+  }
+
+  .year {
+    font-weight: 400;
+  }
+
+  .byline {
+    margin: 0;
+    font-size: 0.95rem;
+  }
+
+  .rating-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin: 0.85rem 0;
+  }
+
+  .watched {
+    font-size: 0.85rem;
+  }
+
+  .description {
+    font-size: 1.05rem;
+  }
+
+  .genres {
+    display: flex;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+  }
+
+  .content {
+    margin: 2rem 0;
+  }
+
+  /* Stills and posters break out past the ~44rem reading column so their
+     detail stays legible — centered, and capped to the viewport so they
+     never cause horizontal scroll. */
+  .content :global(img) {
+    display: block;
+    height: auto;
+    max-width: min(56rem, 94vw);
+    margin-left: 50%;
+    transform: translateX(-50%);
+    border-radius: 8px;
+  }
+</style>

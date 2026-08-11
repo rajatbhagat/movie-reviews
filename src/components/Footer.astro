@@ -1,0 +1,37 @@
+---
+import site from '../data/site.json';
+import { url } from '../utils/url';
+
+const year = new Date().getFullYear();
+---
+
+<footer>
+  <div class="container">
+    <p>
+      © <span id="copyright-year">{year}</span> {site.author} ·
+      <a href={site.portfolio} target="_blank" rel="noopener">Portfolio</a> ·
+      <a href={`mailto:${site.email}`}>Email</a> ·
+      <a href={url('/rss.xml')}>RSS</a>
+    </p>
+  </div>
+</footer>
+
+<script>
+  // The build-time year goes stale on a static site; correct it client-side.
+  // astro:page-load re-fires after each view-transition swap.
+  function setYear() {
+    const el = document.getElementById('copyright-year');
+    if (el) el.textContent = String(new Date().getFullYear());
+  }
+  document.addEventListener('astro:page-load', setYear);
+</script>
+
+<style>
+  footer {
+    border-top: 1px solid var(--border);
+    margin-top: 4rem;
+    padding: 1.5rem 0 2rem;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+  }
+</style>

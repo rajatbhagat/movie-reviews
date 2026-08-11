@@ -1,0 +1,76 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import site from '../../data/site.json';
+import { slugify } from '../../utils/slug';
+import { url } from '../../utils/url';
+
+const reviews = await getCollection('reviews', ({ data }) => !data.draft);
+
+// Group by slug so "Sci-Fi" and "sci-fi" collapse into one genre; the first
+// spelling encountered wins as the display name.
+const bySlug = new Map<string, { name: string; count: number }>();
+for (const review of reviews) {
+  for (const genre of review.data.genres) {
+    const slug = slugify(genre);
+    const entry = bySlug.get(slug) ?? { name: genre, count: 0 };
+    entry.count += 1;
+    bySlug.set(slug, entry);
+  }
+}
+const genres = [...bySlug.entries()].sort((a, b) => b[1].count - a[1].count || a[1].name.localeCompare(b[1].name));
+---
+
+<BaseLayout title={`Genres — ${site.title}`} description="Browse movie reviews by genre.">
+  <h1>Genres</h1>
+  {
+    genres.length === 0 ? (
+      <p class="muted">No genres yet — add a `genres` list to a review's frontmatter.</p>
+    ) : (
+      <div class="genre-grid">
+        {genres.map(([slug, { name, count }]) => (
+          <a href={url(`/genres/${slug}/`)} class="card genre">
+            <span class="name">{name}</span>
+            <span class="muted count">
+              {count} {count === 1 ? 'review' : 'reviews'}
+            </span>
+          </a>
+        ))}
+      </div>
+    )
+  }
+  <p><a href={url('/')}>← All reviews</a></p>
+</BaseLayout>
+
+<style>
+  h1 {
+    margin-top: 2.5rem;
+  }
+
+  .genre-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .genre {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    color: var(--text);
+  }
+
+  .genre:hover {
+    text-decoration: none;
+    border-color: var(--accent);
+  }
+
+  .name {
+    font-weight: 600;
+  }
+
+  .count {
+    font-size: 0.85rem;
+  }
+</style>

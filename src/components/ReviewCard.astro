@@ -1,0 +1,79 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import Rating from './Rating.astro';
+import { slugify } from '../utils/slug';
+import { url } from '../utils/url';
+
+interface Props {
+  review: CollectionEntry<'reviews'>;
+}
+
+const { review } = Astro.props;
+const { title, year, director, rating, genres } = review.data;
+---
+
+<article class="card">
+  <div class="top">
+    <h3><a href={url(`/reviews/${review.id}/`)}>{title}</a> <span class="muted year">({year})</span></h3>
+    <Rating rating={rating} />
+  </div>
+  <p class="muted director">Directed by {director}</p>
+  <p class="muted take">{review.data.description}</p>
+  {
+    genres.length > 0 && (
+      <p class="genres">
+        {genres.map((g) => (
+          <a href={url(`/genres/${slugify(g)}/`)} class="pill">
+            {g}
+          </a>
+        ))}
+      </p>
+    )
+  }
+</article>
+
+<style>
+  .top {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  h3 {
+    margin: 0;
+    font-size: 1.15rem;
+  }
+
+  h3 a {
+    color: var(--text);
+  }
+
+  h3 a:hover {
+    color: var(--accent);
+    text-decoration: none;
+  }
+
+  .year {
+    font-weight: 400;
+    font-size: 0.95rem;
+  }
+
+  .director {
+    margin: 0.25rem 0 0;
+    font-size: 0.85rem;
+  }
+
+  .take {
+    margin: 0.6rem 0 0;
+    font-size: 0.95rem;
+  }
+
+  .genres {
+    display: flex;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+    margin: 0.85rem 0 0;
+  }
+</style>
