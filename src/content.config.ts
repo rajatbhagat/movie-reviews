@@ -8,31 +8,22 @@ import { glob } from 'astro/loaders';
 const reviews = defineCollection({
   // Files starting with `_` (e.g. _template.md) are skipped entirely.
   loader: glob({ pattern: ['**/*.md', '!**/_*.md'], base: './src/content/reviews' }),
-  // The schema is a function so it can use `image()`, which checks that a
-  // poster path actually resolves and hands the pages real image metadata
-  // (dimensions, hashed URL) for Astro to optimise at build time.
-  schema: ({ image }) =>
-    z.object({
-      title: z.string(),
-      year: z.number(),
-      director: z.string(),
-      /** Out of 5. Decimals are fine (3.5) and render as partial stars. */
-      rating: z.number().min(0).max(5),
-      /**
-       * Optional thumbnail, path relative to the markdown file:
-       *   poster: './images/dune-part-two.jpg'
-       * Reviews without one fall back to a generated tile, so this can stay
-       * empty. A path that doesn't resolve fails the build rather than
-       * shipping a broken image.
-       */
-      poster: image().optional(),
-      genres: z.array(z.string()).default([]),
-      /** One-line take, shown on cards and in the RSS feed. */
-      description: z.string(),
-      watchedDate: z.coerce.date(),
-      /** Drafts are excluded from every page, the RSS feed, and the sitemap. */
-      draft: z.boolean().default(false),
-    }),
+  // Reviews are text only — no posters, stills, or thumbnails anywhere. Film
+  // artwork is studio-owned and there is no licence that makes it safe to
+  // republish, so the site does not carry any.
+  schema: z.object({
+    title: z.string(),
+    year: z.number(),
+    director: z.string(),
+    /** Out of 5. Decimals are fine (3.5) and render as partial stars. */
+    rating: z.number().min(0).max(5),
+    genres: z.array(z.string()).default([]),
+    /** One-line take, shown on cards and in the RSS feed. */
+    description: z.string(),
+    watchedDate: z.coerce.date(),
+    /** Drafts are excluded from every page, the RSS feed, and the sitemap. */
+    draft: z.boolean().default(false),
+  }),
 });
 
 export const collections = { reviews };

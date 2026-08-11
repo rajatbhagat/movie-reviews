@@ -38,7 +38,6 @@ title: 'Dune: Part Two'      # required
 year: 2024                    # required, number
 director: 'Denis Villeneuve'  # required
 rating: 4.5                   # required, 0–5, decimals allowed (3.5)
-poster: './images/dune.jpg'   # optional thumbnail; omit for a fallback tile
 genres: [Sci-Fi, Drama]       # optional; new genres create pages automatically
 description: 'One-line take.' # required; shown on cards and in the RSS feed
 watchedDate: 2026-07-20       # required; drives the sort order
@@ -51,32 +50,20 @@ pages, the RSS feed, and the sitemap are all generated from these files. Files
 beginning with `_` are ignored entirely, which is why the template never
 publishes.
 
-### Images
+### No images, on purpose
 
-All images live in `src/content/reviews/images/` and are referenced with a
-relative path starting `./`. Astro resizes, re-encodes, and content-hashes them
-at build time, so drop in the largest version you have — don't pre-shrink
-anything. A path that doesn't resolve fails the build rather than shipping a
-broken image.
+Reviews are text only. There is no `poster` field, no thumbnails, and nothing
+renders images from the markdown body.
 
-**Thumbnail.** The `poster` frontmatter field puts a thumbnail on the left of
-the review, both in the list and at the top of the review itself:
+This is a licensing decision, not an oversight. Film posters and stills are
+studio-owned artwork, and no studio releases them under a licence that makes
+republishing them safe — the "free movie poster" sources either serve
+public-domain material from pre-1931 films or serve copyrighted images under a
+usage policy that doesn't clear the underlying copyright. Rather than rely on a
+fair-use argument holding, the site carries none.
 
-```yaml
-poster: './images/dune.jpg'
-```
-
-Any dimensions work — it's cropped to a 2:3 poster shape. Omit the field and
-the review falls back to a lettered tile built from its title, so a library
-with only some posters filled in still looks deliberate.
-
-**Images in the body.** Add as many as you like, anywhere in the markdown:
-
-```markdown
-![Alt text describing the image](./images/my-screenshot.jpg)
-```
-
-These render wider than the text column so detail stays legible.
+The one image the site ships is `public/og-default.png`, its own branded social
+card, which is original artwork.
 
 ---
 

@@ -54,8 +54,8 @@ const bundlePath = url('/pagefind/');
         new w.PagefindUI({
           element: el,
           bundlePath,
-          // No poster metadata is indexed, so the image slot would just be an
-          // empty box on every result.
+          // The site is text only, so the image slot would just be an empty
+          // box on every result.
           showImages: false,
           showSubResults: true,
         });
