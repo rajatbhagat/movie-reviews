@@ -25,7 +25,13 @@ const watchedStr = watchedDate.toLocaleDateString('en-US', {
 });
 ---
 
-<BaseLayout title={`${title} (${year}) — ${site.title}`} description={description} type="article">
+<BaseLayout
+  title={`${title} (${year}) — ${site.title}`}
+  description={description}
+  type="article"
+  image={poster}
+  imageAlt={`${title} poster`}
+>
   <article>
     <header>
       <Poster poster={poster} title={title} size="detail" />
