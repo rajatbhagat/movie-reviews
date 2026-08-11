@@ -56,7 +56,10 @@ const watchedStr = watchedDate.toLocaleDateString('en-US', {
   image={poster}
   imageAlt={`${title} poster`}
 >
-  <article>
+  {/* Marks this as the only indexable region on the site: once any page
+      declares a Pagefind body, pages without one are skipped entirely, so
+      /best/, /genres/ and /about/ stay out of the results. */}
+  <article data-pagefind-body>
     <header>
       <Poster poster={poster} title={title} size="detail" />
       <div class="head-text">
@@ -85,9 +88,11 @@ const watchedStr = watchedDate.toLocaleDateString('en-US', {
       <Content />
     </div>
 
+    {/* data-pagefind-ignore: these cards quote other films, so indexing them
+        would make every review match its neighbours' titles. */}
     {
       related.length > 0 && (
-        <section class="related">
+        <section class="related" data-pagefind-ignore>
           <h2>Related reviews</h2>
           <div class="review-list">
             {related.map((other) => (
@@ -98,7 +103,7 @@ const watchedStr = watchedDate.toLocaleDateString('en-US', {
       )
     }
 
-    <p><a href={url('/')}>← All reviews</a></p>
+    <p data-pagefind-ignore><a href={url('/')}>← All reviews</a></p>
   </article>
 </BaseLayout>
 

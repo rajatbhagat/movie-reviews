@@ -1,0 +1,108 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import site from '../data/site.json';
+import { url } from '../utils/url';
+
+// Pagefind's index and UI bundle are produced by `pagefind --site dist`, which
+// runs after `astro build`. They don't exist under `astro dev`, so this page
+// only works against a built site: `npm run build && npm run preview`.
+const bundlePath = url('/pagefind/');
+---
+
+<BaseLayout
+  title={`Search — ${site.title}`}
+  description={`Search every review on ${site.title} by title, director, or what the notes actually say.`}
+>
+  <h1>Search</h1>
+  <p class="meta muted">Titles, directors, and the text of the reviews themselves.</p>
+
+  <link rel="stylesheet" href={`${bundlePath}pagefind-ui.css`} />
+  <div id="search" data-bundle-path={bundlePath}></div>
+
+  <noscript>
+    <p class="muted">
+      Search needs JavaScript. <a href={url('/')}>Browse all reviews</a> or
+      <a href={url('/genres/')}>pick a genre</a> instead.
+    </p>
+  </noscript>
+</BaseLayout>
+
+<script>
+  // Runs on every navigation, not just a cold load: view transitions mean the
+  // page can be swapped in without a reload, and the widget has to be rebuilt
+  // each time. The bundle itself is fetched once and reused.
+  function initSearch() {
+    const el = document.getElementById('search');
+    if (!el || el.dataset.ready) return;
+
+    const bundlePath = el.dataset.bundlePath;
+    const w = window as any;
+
+    const load = w.PagefindUI
+      ? Promise.resolve()
+      : new Promise((resolve, reject) => {
+          const script = document.createElement('script');
+          script.src = `${bundlePath}pagefind-ui.js`;
+          script.onload = resolve;
+          script.onerror = reject;
+          document.head.appendChild(script);
+        });
+
+    load
+      .then(() => {
+        el.dataset.ready = 'true';
+        new w.PagefindUI({
+          element: el,
+          bundlePath,
+          // No poster metadata is indexed, so the image slot would just be an
+          // empty box on every result.
+          showImages: false,
+          showSubResults: true,
+        });
+      })
+      .catch(() => {
+        el.innerHTML =
+          '<p class="muted">Search is unavailable — the index failed to load.</p>';
+      });
+  }
+
+  document.addEventListener('astro:page-load', initSearch);
+</script>
+
+<style>
+  h1 {
+    margin-top: 2.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .meta {
+    font-size: 0.9rem;
+    margin-top: 0;
+    margin-bottom: 1.5rem;
+  }
+
+  /* Pagefind builds its own DOM inside #search, so its theming hooks are set
+     here as inherited custom properties. Mapping them onto the site's own
+     variables means the widget follows the light/dark toggle for free. */
+  #search {
+    --pagefind-ui-primary: var(--accent);
+    --pagefind-ui-text: var(--text);
+    --pagefind-ui-background: var(--bg);
+    --pagefind-ui-border: var(--border);
+    --pagefind-ui-tag: var(--bg-soft);
+    --pagefind-ui-border-radius: 8px;
+    --pagefind-ui-border-width: 1px;
+    --pagefind-ui-font: inherit;
+    margin-bottom: 2rem;
+  }
+
+  /* :global because the marks live in Pagefind's own DOM. The browser default
+     is a fixed yellow, which ignores the theme; these two are the site's own
+     variables, so the highlight follows light/dark like everything else. */
+  #search :global(mark) {
+    background: var(--accent-soft);
+    color: var(--text);
+    border-radius: 3px;
+    padding: 0 0.15em;
+  }
+</style>
