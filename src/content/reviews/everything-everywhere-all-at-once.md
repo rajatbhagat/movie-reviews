@@ -21,9 +21,9 @@ year: 2022
 # Required. Free text — comma-separate co-directors, as here.
 director: 'Daniel Kwan, Daniel Scheinert'
 
-# Required. 0–10, decimals allowed. The star bar is computed from this, so
-# 8.5 renders as four and a quarter filled stars. Never write stars by hand.
-rating: 8.5
+# Required. 0–5, decimals allowed. The star bar is computed from this, so
+# 3.5 renders as three and a half filled stars. Never write stars by hand.
+rating: 4
 
 # Optional thumbnail, shown on the left of this review everywhere it appears.
 # Drop the file in src/content/reviews/images/ and point at it relatively.

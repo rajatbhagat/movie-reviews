@@ -2,7 +2,7 @@
 title: 'Past Lives'
 year: 2023
 director: 'Celine Song'
-rating: 8.5
+rating: 4
 genres: [Drama, Romance]
 description: 'A quiet film about the lives you do not get to live, with no villain and nothing wasted.'
 watchedDate: 2026-07-28

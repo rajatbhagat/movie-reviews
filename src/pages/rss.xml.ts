@@ -14,7 +14,7 @@ export async function GET(context: APIContext) {
     // context.site is the bare origin; the feed's own home is origin + base.
     site: new URL(import.meta.env.BASE_URL, context.site!),
     items: reviews.map((review) => ({
-      title: `${review.data.title} (${review.data.year}) — ${review.data.rating}/10`,
+      title: `${review.data.title} (${review.data.year}) — ${review.data.rating}/5`,
       description: review.data.description,
       pubDate: review.data.watchedDate,
       categories: review.data.genres,

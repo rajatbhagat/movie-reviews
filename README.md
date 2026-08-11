@@ -37,7 +37,7 @@ Then:
 title: 'Dune: Part Two'      # required
 year: 2024                    # required, number
 director: 'Denis Villeneuve'  # required
-rating: 9                     # required, 0–10, decimals allowed (7.5)
+rating: 4.5                   # required, 0–5, decimals allowed (3.5)
 poster: './images/dune.jpg'   # optional thumbnail; omit for a fallback tile
 genres: [Sci-Fi, Drama]       # optional; new genres create pages automatically
 description: 'One-line take.' # required; shown on cards and in the RSS feed
