@@ -1,0 +1,128 @@
+---
+import type { GetStaticPaths, Page } from 'astro';
+import type { CollectionEntry } from 'astro:content';
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ReviewCard from '../components/ReviewCard.astro';
+import site from '../data/site.json';
+import { url } from '../utils/url';
+
+export const getStaticPaths = (async ({ paginate }) => {
+  // Declared in here rather than at module scope: getStaticPaths is hoisted and
+  // evaluated on its own, so outer consts aren't reliably in scope.
+  const PAGE_SIZE = 20;
+
+  const reviews = (await getCollection('reviews', ({ data }) => !data.draft)).sort(
+    (a, b) => b.data.watchedDate.valueOf() - a.data.watchedDate.valueOf()
+  );
+
+  // paginate() does the slicing, but on this route it would emit page 2 at
+  // `/2/`. Rewriting the rest param moves the later pages under `/page/` and
+  // leaves page 1 at `/`, so every existing link and sitemap entry still
+  // resolves. This makes `page.url.*` stale — prev/next come from pageHref().
+  return paginate(reviews, { pageSize: PAGE_SIZE }).map((entry) => ({
+    ...entry,
+    params: { page: entry.params.page ? `page/${entry.params.page}` : undefined },
+  }));
+}) satisfies GetStaticPaths;
+
+const { page } = Astro.props as { page: Page<CollectionEntry<'reviews'>> };
+
+const pageHref = (n: number) => url(n === 1 ? '/' : `/page/${n}/`);
+---
+
+<BaseLayout
+  title={page.currentPage === 1 ? site.title : `${site.title} — page ${page.currentPage}`}
+  description={site.metaDescription}
+>
+  <section class="intro">
+    <h1>{site.title}</h1>
+    <p class="muted tagline">{site.tagline}</p>
+  </section>
+
+  <p class="meta muted">
+    {page.total} {page.total === 1 ? 'review' : 'reviews'} · newest first ·
+    <a href={url('/best/')}>see the best</a> ·
+    <a href={url('/genres/')}>browse by genre</a>
+  </p>
+
+  {
+    page.total === 0 ? (
+      <p class="muted">
+        No reviews published yet. Drop a markdown file in
+        <code>src/content/reviews/</code> to add one.
+      </p>
+    ) : (
+      <div class="review-list">
+        {page.data.map((review) => (
+          <ReviewCard review={review} />
+        ))}
+      </div>
+    )
+  }
+
+  {
+    page.lastPage > 1 && (
+      <nav class="pagination" aria-label="Pagination">
+        {page.currentPage > 1 ? (
+          <a href={pageHref(page.currentPage - 1)} rel="prev">
+            ← Newer
+          </a>
+        ) : (
+          <span class="muted">← Newer</span>
+        )}
+        <span class="muted position">
+          Page {page.currentPage} of {page.lastPage}
+        </span>
+        {page.currentPage < page.lastPage ? (
+          <a href={pageHref(page.currentPage + 1)} rel="next">
+            Older →
+          </a>
+        ) : (
+          <span class="muted">Older →</span>
+        )}
+      </nav>
+    )
+  }
+</BaseLayout>
+
+<style>
+  .intro {
+    margin-top: 2.5rem;
+  }
+
+  h1 {
+    margin-bottom: 0.5rem;
+  }
+
+  .tagline {
+    font-size: 1.05rem;
+    margin-top: 0;
+    max-width: 44rem;
+  }
+
+  .meta {
+    font-size: 0.9rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .review-list {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .pagination {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-top: 2rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--border);
+    font-size: 0.95rem;
+  }
+
+  .position {
+    font-size: 0.85rem;
+  }
+</style>
