@@ -2,6 +2,7 @@
 import { getCollection, render } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Rating from '../../components/Rating.astro';
+import Poster from '../../components/Poster.astro';
 import site from '../../data/site.json';
 import { slugify } from '../../utils/slug';
 import { url } from '../../utils/url';
@@ -16,7 +17,7 @@ export async function getStaticPaths() {
 
 const { review } = Astro.props;
 const { Content } = await render(review);
-const { title, year, director, rating, genres, description, watchedDate } = review.data;
+const { title, year, director, rating, genres, description, watchedDate, poster } = review.data;
 const watchedStr = watchedDate.toLocaleDateString('en-US', {
   year: 'numeric',
   month: 'long',
@@ -27,24 +28,27 @@ const watchedStr = watchedDate.toLocaleDateString('en-US', {
 <BaseLayout title={`${title} (${year}) — ${site.title}`} description={description} type="article">
   <article>
     <header>
-      <h1>{title} <span class="muted year">({year})</span></h1>
-      <p class="byline muted">Directed by {director}</p>
-      <div class="rating-row">
-        <Rating rating={rating} size="lg" />
-        <span class="muted watched">Watched {watchedStr}</span>
+      <Poster poster={poster} title={title} size="detail" />
+      <div class="head-text">
+        <h1>{title} <span class="muted year">({year})</span></h1>
+        <p class="byline muted">Directed by {director}</p>
+        <div class="rating-row">
+          <Rating rating={rating} size="lg" />
+          <span class="muted watched">Watched {watchedStr}</span>
+        </div>
+        <p class="muted description">{description}</p>
+        {
+          genres.length > 0 && (
+            <p class="genres">
+              {genres.map((g) => (
+                <a href={url(`/genres/${slugify(g)}/`)} class="pill">
+                  {g}
+                </a>
+              ))}
+            </p>
+          )
+        }
       </div>
-      <p class="muted description">{description}</p>
-      {
-        genres.length > 0 && (
-          <p class="genres">
-            {genres.map((g) => (
-              <a href={url(`/genres/${slugify(g)}/`)} class="pill">
-                {g}
-              </a>
-            ))}
-          </p>
-        )
-      }
     </header>
 
     <div class="content">
@@ -59,6 +63,17 @@ const watchedStr = watchedDate.toLocaleDateString('en-US', {
   article {
     max-width: 44rem;
     margin: 2.5rem auto 0;
+  }
+
+  header {
+    display: flex;
+    gap: 1.75rem;
+    align-items: flex-start;
+  }
+
+  .head-text {
+    min-width: 0;
+    flex: 1;
   }
 
   h1 {

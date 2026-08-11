@@ -38,6 +38,7 @@ title: 'Dune: Part Two'      # required
 year: 2024                    # required, number
 director: 'Denis Villeneuve'  # required
 rating: 9                     # required, 0–10, decimals allowed (7.5)
+poster: './images/dune.jpg'   # optional thumbnail; omit for a fallback tile
 genres: [Sci-Fi, Drama]       # optional; new genres create pages automatically
 description: 'One-line take.' # required; shown on cards and in the RSS feed
 watchedDate: 2026-07-20       # required; drives the sort order
@@ -52,9 +53,30 @@ publishes.
 
 ### Images
 
-Put images next to the review (e.g. `src/content/reviews/images/still.jpg`) and
-reference them relatively: `![Caption](./images/still.jpg)`. They render wider
-than the text column automatically.
+All images live in `src/content/reviews/images/` and are referenced with a
+relative path starting `./`. Astro resizes, re-encodes, and content-hashes them
+at build time, so drop in the largest version you have — don't pre-shrink
+anything. A path that doesn't resolve fails the build rather than shipping a
+broken image.
+
+**Thumbnail.** The `poster` frontmatter field puts a thumbnail on the left of
+the review, both in the list and at the top of the review itself:
+
+```yaml
+poster: './images/dune.jpg'
+```
+
+Any dimensions work — it's cropped to a 2:3 poster shape. Omit the field and
+the review falls back to a lettered tile built from its title, so a library
+with only some posters filled in still looks deliberate.
+
+**Images in the body.** Add as many as you like, anywhere in the markdown:
+
+```markdown
+![Alt text describing the image](./images/my-screenshot.jpg)
+```
+
+These render wider than the text column so detail stays legible.
 
 ---
 
